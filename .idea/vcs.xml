@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/旅游系统/tourismsystem" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/生产制造管理系统" vcs="Git" />
+  </component>
+</project>
