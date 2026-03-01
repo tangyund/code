@@ -1,0 +1,27 @@
+server:
+  port: 9898
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql:///mes2509?serverTimezone=Asia/Shanghai
+    username: root
+    password:
+  servlet:
+    multipart:
+      max-file-size: 10MB
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    use-actual-param-name: true
+mybatis-plus:
+  type-aliases-package: com.qidianit.mes.pojo,com.qidianit.mes.pro.pojo
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+
+
+imagePath: C:\temp\images
+
+process_code_type: PROCESS_CODE

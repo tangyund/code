@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qidian.mespro.mapper.ProductionReportingMapper">
+    <insert id="addReport">
+        insert into production_reporting(report_code,type_id,task_code,station_name,process_name,production_order_code,material_code,
+        material_name,status,report_num,create_time,create_by,review_by) values(#{reportCode},#{typeId},#{taskCode},#{stationName},#{processName},
+        #{productionOrderCode},#{materialCode},#{materialName},#{status},#{reportNum},#{createTime},#{createBy},#{reviewBy})
+    </insert>
+    <update id="updateReport">
+        update production_reporting
+        set report_code = #{reportCode},
+        type_id = #{typeId},
+        task_code = #{taskCode},
+        station_name = #{stationName},
+        process_name = #{processName},
+        production_order_code = #{productionOrderCode},
+        material_code = #{materialCode},
+        material_name = #{materialName},
+        status = #{status},
+        report_num = #{reportNum},
+        create_time = #{createTime},
+        create_by = #{createBy},
+        review_by = #{reviewBy},
+        update_time = CURRENT_TIMESTAMP,
+        update_by = #{updateBy}
+        where id = #{id}
+    </update>
+    <update id="deletReportById">
+        update production_reporting set production_reporting.delete_flag=1
+        WHERE production_reporting.id=#{id}
+    </update>
+
+
+
+    <select id="selectProductionList" resultType="com.qidianit.mes.pro.pojo.ProductionReporting">
+        SELECT * FROM production_reporting WHERE production_reporting.delete_flag!=1
+        <if test="typeId!=null">
+            And type_id =#{typeId}
+        </if>
+        <if test="stationName!=null and stationName!=''">
+            And station_name LIKE CONCAT('%', #{stationName}, '%')
+        </if>
+        <if test="productionOrderCode!=null and productionOrderCode!=''">
+            And production_order_code =#{productionOrderCode}
+        </if>
+        <if test="materialCode!=null and materialCode!=''">
+            And material_code =#{materialCode}
+        </if>
+        <if test="materialName!=null and materialName!=''">
+            And material_name =#{materialName}
+        </if>
+        <if test="createBy!=null and createBy!=''">
+            And create_by =#{createBy}
+        </if>
+        <if test="reviewBy!=null and reviewBy!=''">
+            And review_by =#{reviewBy}
+        </if>
+        <if test="status!=null">
+            And status =#{status}
+        </if>
+    </select>
+    <select id="selectReportById" resultType="com.qidianit.mes.pro.pojo.ProductionReporting">
+        select * from production_reporting where production_reporting.delete_flag!=1 and production_reporting.id=#{id}
+    </select>
+    <select id="selectTask" resultType="com.qidianit.mes.pro.pojo.TaskList">
+        SELECT * from task_list where task_list.delete_flag!=1
+        <if test="workstationName!=null and workstationName!=''">
+            And workstation_name LIKE CONCAT('%', #{workstationName}, '%')
+        </if>
+        <if test="productionOrderCode!=null and productionOrderCode!=''">
+            And production_order_code= #{productionOrderCode}
+        </if>
+    </select>
+    <update id="confirmReport">
+        update production_reporting set production_reporting.status=40 WHERE  production_reporting.delete_flag!=1 and production_reporting.id=#{id}
+    </update>
+    <update id="auditReport">
+        update production_reporting set production_reporting.status=41 WHERE  production_reporting.delete_flag!=1 and production_reporting.id=#{id}
+    </update>
+    <update id="cancelRoport">
+        update production_reporting set production_reporting.status=39 WHERE  production_reporting.delete_flag!=1 and production_reporting.id=#{id}
+    </update>
+    <update id="deleteByIdList">
+        update production_reporting set production_reporting.delete_flag=1
+        where id in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </update>
+
+</mapper>

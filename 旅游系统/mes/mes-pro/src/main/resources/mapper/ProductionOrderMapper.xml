@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qidian.mespro.mapper.ProductionOrderMapper">
+    <resultMap id="rm1" type="com.qidian.mespro.vo.ProductionOrderVo">
+        <id column="id" property="id"/>
+        <result column="production_order_code" property="productionOrderCode"/>
+        <result column="production_order_name" property="productionOrderName"/>
+        <result column="production_order_type" property="productionOrderType"/>
+        <result column="production_order_source" property="productionOrderSource"/>
+        <result column="order_code" property="orderCode"/>
+        <result column="material_code" property="materialCode"/>
+        <result column="materialName" property="materialName"/>
+        <result column="production_order_quantity" property="productionOrderQuantity"/>
+        <result column="produced_quantity" property="producedQuantity"/>
+        <result column="customer_code" property="customerCode"/>
+        <result column="customerName" property="customerName"/>
+        <result column="supplier_code" property="supplierCode"/>
+        <result column="request_date" property="requestDate"/>
+        <result column="status" property="status"/>
+        <result column="qr_code_url" property="qrCodeUrl"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="remark" property="remark"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="creator_id" property="creatorId"/>
+        <result column="updator_id" property="updatorId"/>
+        <association property="typeDictData" javaType="com.qidianit.mes.pojo.SysDictData" select="selectBytypeDictData" column="production_order_type"/>
+        <association property="statusDictData" javaType="com.qidianit.mes.pojo.SysDictData" select="selectBySysDictData" column="status"/>
+        <association property="customer" javaType="com.qidianit.mes.pojo.Customer" select="selectByCustomerCode" column="customer_code"/>
+        <association property="material" javaType="com.qidianit.mes.pojo.Material" select="selectByMaterialCode" column="material_code"/>
+
+
+    </resultMap>
+    <update id="updateProductionOrder" useGeneratedKeys="true" keyProperty="id">
+        update production_order set production_order_code=#{productionOrderCode},production_order_name=#{productionOrderName},
+        production_order_type=#{productionOrderType},production_order_source=#{productionOrderSource},material_code=#{materialCode},
+        production_order_quantity=#{productionOrderQuantity},request_date=#{requestDate}
+        <if test="orderCode!=null and orderCode!=''">
+            ,order_code=#{orderCode}
+        </if>
+        <if test="customerCode!=null and customerCode!=''">
+            ,customer_code=#{customerCode}
+        </if>
+        <if test="supplierCode!=null and supplierCode!=''||productionOrderType==37||productionOrderType==38">
+            ,supplier_code=#{supplierCode}
+        </if>
+        <if test="remark!=null and remark!=''">
+            ,remark=#{remark}
+        </if>
+        where id=#{id}
+    </update>
+
+    <update id="deleteProductionOrder">
+        update production_order set delete_flag=1 where id=#{id}
+    </update>
+    <update id="auditProductionOrder">
+        update production_order set status=41 where production_order.delete_flag!=1 and id=#{id}
+    </update>
+
+    <update id="confirmProductionOrder">
+        update production_order set status=40 where production_order.delete_flag!=1 and id=#{id}
+    </update>
+    <update id="cancleProductionOrder">
+        update production_order set status=39 where production_order.delete_flag!=1 and id=#{id}
+    </update>
+    <update id="updateTasklist">
+        UPDATE task_list
+        SET
+            task_code = #{taskCode},
+            task_name = #{taskName},
+            workstation_code = #{workstationCode},
+            workstation_name = #{workstationName},
+            workflow_id = #{workflowId},
+            process_id = #{processId},
+            scheduled_quantity = #{scheduledQuantity},
+            produced_quantity = #{producedQuantity},
+            start_time = #{startTime},
+            production_duration = #{productionDuration},
+            estimated_completion_time = #{estimatedCompletionTime},
+            display_color = #{displayColor},
+            production_order_code = #{productionOrderCode}
+        WHERE
+            id = #{id};
+    </update>
+    <update id="deleteById">
+        update task_list set task_list.delete_flag=1 WHERE id=#{id}
+    </update>
+    <update id="deleteByIdList">
+        update task_list set task_list.delete_flag=1
+        where id in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </update>
+
+
+    <select id="selectByProductionOrdrList" resultMap="rm1">
+        SELECT production_order.* ,material.name as materialName, customer.name as customerName FROM production_order
+        JOIN material ON material.`code`=production_order.material_code
+          LEFT JOIN customer ON customer.`code`=production_order.customer_code
+          where production_order.delete_flag!=1 and material.delete_flag!=1 AND (customer.delete_flag!=1 OR customer.delete_flag IS NULL)
+        <if test="productionOrderCode!=null and productionOrderCode!=''">
+            And production_order_code =#{productionOrderCode}
+        </if>
+        <if test="productionOrderName!=null and productionOrderName!=''">
+            And production_order_name LIKE CONCAT('%', #{productionOrderName}, '%')
+        </if>
+        <if test="productionOrderSource!=null and productionOrderSource!=''">
+            And production_order_source =#{productionOrderSource}
+        </if>
+        <if test="materialCode!=null and materialCode!=''">
+            And material_code =#{materialCode}
+        </if>
+        <if test="materialName!=null and materialName!=''">
+            And material.name LIKE CONCAT('%', #{materialName}, '%')
+        </if>
+        <if test="customerCode!=null and customerCode!=''">
+            And customer_code = #{customerCode}
+        </if>
+        <if test="customerName!=null and customerName!=''">
+            And customer.name LIKE CONCAT('%', #{customerName}, '%')
+        </if>
+        <if test="productionOrderType!=null and productionOrderType!=''">
+            And production_order_type = #{productionOrderType}
+        </if>
+        <if test="status!=null and status!=''">
+            And production_order.status = #{status}
+        </if>
+        <if test="requestDate!=null and requestDate!=''">
+            And request_date = #{requestDate}
+        </if>
+    </select>
+
+    <select id="selectBySysDictData" resultType="com.qidianit.mes.pojo.SysDictData">
+        select * from sys_dict_data
+        WHERE sys_dict_data.delete_flag!=1 and sys_dict_data.id=#{status}
+    </select>
+
+    <select id="selectBytypeDictData" resultType="com.qidianit.mes.pojo.SysDictData">
+        select * from sys_dict_data
+        WHERE sys_dict_data.delete_flag!=1 and sys_dict_data.id=#{status}
+    </select>
+
+    <select id="selectByCustomerCode" resultType="com.qidianit.mes.pojo.Customer">
+        select * FROM customer
+        where customer.delete_flag!=1  and customer.code=#{code}
+    </select>
+
+    <select id="selectByMaterialCode" resultType="com.qidianit.mes.pojo.Material">
+        select * from material
+        where material.delete_flag!=1  and material.code=#{code}
+    </select>
+
+    <select id="selectByUnitAndMaterialAndCustomerCode" resultType="com.qidianit.mes.pojo.Unit">
+        select unit.* from unit join material ON unit.id=material.unit_id
+        where material.delete_flag!=1 and unit.delete_flag!=1 and material.code=#{code}
+    </select>
+
+    <select id="selectByIdProductionOrderVo" resultType="com.qidian.mespro.vo.ProductionOrderVo">
+        SELECT production_order.* ,material.name as materialName, customer.name as customerName FROM production_order
+         JOIN material ON material.`code`=production_order.material_code
+         LEFT JOIN customer ON customer.`code`=production_order.customer_code
+        where production_order.delete_flag!=1 and material.delete_flag!=1 AND (customer.delete_flag!=1 OR customer.delete_flag IS NULL)
+        and production_order.id=#{id}
+    </select>
+    <select id="selectByCodeSupplier" resultType="com.qidianit.mes.pojo.Supplier">
+        SELECT * FROM supplier WHERE (supplier.delete_flag != 1 or supplier.delete_flag is null)  and supplier.code=#{code}
+    </select>
+
+
+    <insert id="insertProdcutionOrder" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO production_order (
+        production_order_code,
+        production_order_name,
+        production_order_type,
+        production_order_source,
+        material_code,
+        production_order_quantity,
+        request_date,
+        status,
+        <trim suffixOverrides=",">
+            <if test="orderCode != null and orderCode != ''">
+                order_code,
+            </if>
+            <if test="customerCode != null and customerCode != ''">
+                customer_code,
+            </if>
+            <if test="supplierCode != null and supplierCode != ''">
+                supplier_code,
+            </if>
+            <if test="parentId != null">
+                parent_id,
+            </if>
+            <if test="remark != null and remark != ''">
+                remark,
+            </if>
+        </trim>
+        ) VALUES (
+        #{productionOrderCode},
+        #{productionOrderName},
+        #{productionOrderType},
+        #{productionOrderSource},
+        #{materialCode},
+        #{productionOrderQuantity},
+        #{requestDate},
+        #{status},
+        <trim suffixOverrides=",">
+            <if test="orderCode != null and orderCode != ''">
+                #{orderCode},
+            </if>
+            <if test="customerCode != null and customerCode != ''">
+                #{customerCode},
+            </if>
+            <if test="supplierCode != null and supplierCode != ''">
+                #{supplierCode},
+            </if>
+            <if test="parentId != null">
+                #{parentId},
+            </if>
+            <if test="remark != null and remark != ''">
+                #{remark},
+            </if>
+        </trim>
+        )
+    </insert>
+    <insert id="addTaskList">
+        insert into task_list(task_code,task_name,workstation_code,workstation_name,workflow_id,process_id,scheduled_quantity,produced_quantity,start_time
+        ,production_duration,estimated_completion_time,display_color,production_order_code)
+        values (#{taskCode},#{taskName},#{workstationCode},#{workstationName},#{workflowId},#{processId},#{scheduledQuantity},#{producedQuantity},#{startTime}
+               ,#{productionDuration},#{estimatedCompletionTime},#{displayColor},#{productionOrderCode})
+    </insert>
+
+    <select id="selectByIdOrderCode" resultType="com.qidianit.mes.pro.pojo.ProductionOrder">
+         select * from production_order
+        where production_order.delete_flag!=1 and production_order.production_order_code=#{code} limit 1
+    </select>
+
+    <select id="selectByParentCodeMaterials" resultType="com.qidianit.mes.pro.pojo.MaterialBom">
+        select * FROM material join material_bom ON material.id=material_bom.parent_material_id
+        where material.delete_flag!=1 and material_bom.delete_flag!=1 and material.code=#{code}
+    </select>
+
+    <select id="selectByMaterialId" resultType="com.qidianit.mes.pojo.Material">
+        select * from material where material.delete_flag!=1 and material.id=#{id}
+    </select>
+
+    <select id="selectAllReadyByProductionOrderList" resultType="com.qidian.mespro.vo.ProductionOrderVo">
+        SELECT production_order.* ,material.name as materialName, customer.name as customerName FROM production_order
+        JOIN material ON material.`code`=production_order.material_code
+        LEFT JOIN customer ON customer.`code`=production_order.customer_code
+        where production_order.delete_flag!=1 and material.delete_flag!=1
+        AND (customer.delete_flag!=1 OR customer.delete_flag IS NULL) and production_order.status=41
+        <if test="productionOrderCode!=null and productionOrderCode!=''">
+            And production_order_code =#{productionOrderCode}
+        </if>
+        <if test="productionOrderName!=null and productionOrderName!=''">
+            And production_order_name LIKE CONCAT('%', #{productionOrderName}, '%')
+        </if>
+        <if test="productionOrderSource!=null and productionOrderSource!=''">
+            And production_order_source =#{productionOrderSource}
+        </if>
+        <if test="materialCode!=null and materialCode!=''">
+            And material_code =#{materialCode}
+        </if>
+        <if test="materialName!=null and materialName!=''">
+            And material.name LIKE CONCAT('%', #{materialName}, '%')
+        </if>
+        <if test="customerCode!=null and customerCode!=''">
+            And customer_code = #{customerCode}
+        </if>
+        <if test="customerName!=null and customerName!=''">
+            And customer.name LIKE CONCAT('%', #{customerName}, '%')
+        </if>
+        <if test="productionOrderType!=null and productionOrderType!=''">
+            And production_order_type = #{productionOrderType}
+        </if>
+        <if test="status!=null and status!=''">
+            And production_order.status = #{status}
+        </if>
+        <if test="requestDate!=null">
+            And request_date = #{requestDate}
+        </if>
+    </select>
+    <select id="selectByIdProductVoAndMaterialAndUnit" resultType="com.qidian.mespro.vo.ProductionOrderVo">
+        select * from production_order WHERE production_order.delete_flag!=1 and production_order.id=#{id}
+    </select>
+    <select id="selectProcessByMatericalCode" resultType="com.qidianit.mes.pro.pojo.Workflow">
+        SELECT *
+        FROM workflow
+                 JOIN work_flow_product ON workflow.id=work_flow_product.workflow_id
+        where work_flow_product.product_code=#{code}
+    </select>
+    <select id="selectProcessByWorkflowID" resultType="com.qidianit.mes.pro.pojo.Process">
+        select *
+        from process
+                 left JOIN work_flow_process ON work_flow_process.process_id=process.id
+        where work_flow_process.workflow_id=#{id}
+    </select>
+    <select id="selectTaskListByworkflowIdandProcessId" resultType="com.qidianit.mes.pro.pojo.TaskList">
+        SELECT * from task_list WHERE task_list.delete_flag!=1 and task_list.workflow_id=#{workflowId} and task_list.process_id=#{processId} and production_order_code=#{code}
+    </select>
+    <select id="selectTaskListById" resultType="com.qidianit.mes.pro.pojo.TaskList">
+        select * from task_list WHERE task_list.delete_flag!=1 and task_list.id=#{id}
+    </select>
+    <select id="selectByTaskListCode" resultType="com.qidianit.mes.pro.pojo.TaskList">
+        select * from task_list WHERE task_list.delete_flag!=1 and task_list.task_code=#{code}
+    </select>
+
+
+</mapper>

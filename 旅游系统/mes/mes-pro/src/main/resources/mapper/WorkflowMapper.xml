@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qidian.mespro.mapper.WorkflowMapper">
+    <insert id="addworkflow">
+        insert  into workflow(workflow_code,workflow_name,status,workflow_description,remarks)
+        values (#{workflowCode},#{workflowName},#{status},#{workflowDescription},#{remarks})
+    </insert>
+    <update id="updateworkflow">
+        update workflow  set update_time = now()
+        <if test="workflowCode!=null and workflowCode!=''">
+            ,workflow_code=#{workflowCode}
+        </if>
+        <if test="workflowName!=null and workflowName!=''">
+            ,workflow_name=#{workflowName}
+        </if>
+        <if test="status!=null">
+            ,status=#{status}
+        </if>
+        <if test="workflowDescription!=null and workflowDescription!=''">
+            ,workflow_description=#{workflowDescription}
+        </if>
+        <if test="remarks!=null and remarks!=''">
+            ,remarks=#{remarks}
+        </if>
+        where id = #{id}
+    </update>
+    <update id="deleteWorkflow">
+        update workflow set delete_flag=1 where id=#{id}
+    </update>
+    <update id="batchDelete">
+        update workflow set delete_flag=1
+        where id in
+         <foreach collection="ids" item="id" separator="," open="(" close=")">
+             #{id}
+         </foreach>
+    </update>
+
+    <select id="selectList" resultType="com.qidianit.mes.pro.pojo.Workflow">
+        select * from workflow where delete_flag!=1
+        <if test="workflowCode!=null and workflowCode!=''">
+            And workflow_code LIKE CONCAT('%', #{workflowCode}, '%')
+        </if>
+        <if test="workflowName!=null and workflowName!=''">
+            And workflow_name LIKE CONCAT('%', #{workflowName}, '%')
+        </if>
+        <if test="status!=null">
+            And status=#{status}
+        </if>
+    </select>
+    <select id="selectByCode" resultType="com.qidianit.mes.pro.pojo.Workflow">
+        select * from workflow where delete_flag!=1 and workflow_code=#{code}
+    </select>
+
+</mapper>

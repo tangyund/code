@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qidian.mespro.mapper.CodeAutoInfoMapper">
+    <insert id="save" parameterType="com.qidianit.mes.pojo.CodeAutoInfo">
+      insert into code_auto_info(type,pre,sequence)
+      values (#{type},#{pre},#{sequence})
+    </insert>
+    <update id="update" parameterType="com.qidianit.mes.pojo.CodeAutoInfo">
+     update code_auto_info
+     <set>
+         <if test="type!=null and type!=''">
+             ,type=#{type}
+         </if>
+         <if test="pre!=null and pre!=''">
+             ,pre=#{pre}
+         </if>
+         <if test="sequence!=null and sequence  !=''">
+             ,sequence=#{sequence}
+         </if>
+     </set>
+
+    </update>
+
+    <select id="selectlist" resultType="com.qidianit.mes.pojo.CodeAutoInfo">
+        select * from code_auto_info
+    </select>
+    <select id="selectByType" resultType="com.qidianit.mes.pojo.CodeAutoInfo">
+        select * from code_auto_info where type=#{type}
+    </select>
+</mapper>

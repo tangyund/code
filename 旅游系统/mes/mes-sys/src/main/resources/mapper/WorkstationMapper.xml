@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qidianit.mes.sys.mapper.WorkstationMapper">
+
+    <select id="selectProcessAndWorkshopByProcessId" resultType="com.qidianit.mes.pojo.Workstation">
+        SELECT
+        ws.*,
+        p.process_name as processName,
+        w.name as workshopName
+        FROM workstation ws
+        JOIN process p ON p.id = ws.process_id
+        JOIN workshop w ON w.id = ws.workshop_id
+        <where>
+            <if test="code != null and code != ''">
+                AND ws.code =#{code}
+            </if>
+            <if test="processName != null and processName != ''">
+                AND p.process_name like CONCAT('%', #{processName}, '%')
+            </if>
+            <if test="workshopName != null and workshopName != ''">
+                AND w.name like CONCAT('%', #{workshopName}, '%')
+            </if>
+            AND ws.process_id = #{processId}
+        </where>
+    </select>
+    <select id="selectALLStation" resultType="com.qidianit.mes.pojo.Workstation">
+        SELECT
+        ws.*,
+        p.process_name as processName,
+        w.name as workshopName
+        FROM workstation ws
+        JOIN process p ON p.id = ws.process_id
+        JOIN workshop w ON w.id = ws.workshop_id
+        <where>
+            <if test="code != null and code != ''">
+                AND ws.code =#{code}
+            </if>
+            <if test="processName != null and processName != ''">
+                AND p.process_name like CONCAT('%', #{processName}, '%')
+            </if>
+            <if test="workshopName != null and workshopName != ''">
+                AND w.name like CONCAT('%', #{workshopName}, '%')
+            </if>
+        </where>
+    </select>
+</mapper>

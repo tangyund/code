@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qidian.mespro.mapper.ProcessStepMapper">
+    <update id="updateById" parameterType="com.qidianit.mes.pro.pojo.ProcessStep">
+    update process_step set update_time = now()
+        <if test="processId!=null and processId!=''">
+            ,processId=#{processId}
+        </if>
+        <if test="stepOrder!=null and stepOrder!=''">
+            ,step_order=#{stepOrder}
+        </if>
+        <if test="materialUrl!=null and materialUrl!=''">
+            ,material_url=#{materialUrl}
+        </if>
+        <if test="auxiliaryEquipment!=null and auxiliaryEquipment!=''">
+            ,auxiliary_equipment=#{auxiliaryEquipment}
+        </if>
+
+        <if test="auxiliaryMaterials!=null and auxiliaryMaterials!=''">
+            ,auxiliary_materials=#{auxiliaryMaterials}
+        </if>
+        <if test="stepDescription!=null and stepDescription!=''">
+            ,step_description=#{stepDescription}
+        </if>
+        <if test="remarks!=null and remarks!=''">
+            ,remarks=#{remarks}
+        </if>
+        where id = #{id}
+
+    </update>
+    <update id="deleteById">
+        update process_step set is_deleted=1 where id=#{id}
+    </update>
+
+    <select id="selectByProcessId" resultType="com.qidianit.mes.pro.pojo.ProcessStep">
+        select *  from process_step where is_deleted!=1 and processId=#{processId}
+    </select>
+    <select id="selectById" resultType="com.qidianit.mes.pro.pojo.ProcessStep">
+        select * from process_step where is_deleted!=1 and id =#{id}
+    </select>
+</mapper>
