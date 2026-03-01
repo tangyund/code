@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qidianit.mes.sys.mapper.DictTypeMapper">
+
+    <resultMap id="BaseMap" type="com.qidianit.mes.pojo.SysDictType">
+        <id column="id" property="id" />
+        <result column="dict_name" property="dictName" />
+        <result column="dict_type" property="dictType" />
+        <result column="status" property="status" />
+        <result column="created_by" property="createdBy" />
+        <result column="created_time" property="createdTime" />
+        <result column="updated_by" property="updatedBy" />
+        <result column="updated_time" property="updatedTime" />
+        <result column="remark" property="remark" />
+    </resultMap>
+
+    <select id="selectDictTypePage" resultMap="BaseMap">
+        select * from sys_dict_type where 1=1
+        <if test="dictType.dictType != null and dictType.dictType != ''">
+            and dict_type like concat('%',#{dictType.dictType},'%')
+        </if>
+        <if test="dictType.dictName != null and dictType.dictName != ''">
+            and dict_name like concat('%',#{dictType.dictName},'%')
+        </if>
+        <if test="dictType.status != null">
+            and status = #{dictType.status}
+        </if>
+    </select>
+</mapper>

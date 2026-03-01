@@ -1,0 +1,24 @@
+server:
+  port: 9198
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/mes2509?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf8
+    username: root
+    password:  # 若有密码请填写，如password: 123456
+  servlet:
+    multipart:
+      max-file-size: 10MB
+
+# 只保留MyBatis-Plus配置（避免与MyBatis冲突）
+mybatis-plus:
+  type-aliases-package: com.qidianit.mes.pojo,com.qidianit.mes.pro.pojo
+  mapper-locations: classpath:mapper/*.xml  # 映射文件路径
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl  # 打印SQL日志
+    map-underscore-to-camel-case: true  # 关键：开启下划线转驼峰
+    use-actual-param-name: true  # 使用实际参数名（可选，默认true）
+
+imagePath: C:\temp\images
+
+process_code_type: PROCESS_CODE
